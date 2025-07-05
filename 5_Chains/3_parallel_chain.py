@@ -19,12 +19,17 @@ prompt_template_2 = PromptTemplate(
   input_variables=['text']
 )
 
+prompt_template_3 = PromptTemplate(
+  template='Merge the provided notes and quiz into a single document \n notes -> {notes} and quiz -> {quiz}',
+  input_variables=['notes', 'quiz']
+)
+
 parser = StrOutputParser()
 
 parallel_chain = RunnableParallel(
   {
     "notes": prompt_template_1 | model | parser,
-    "qa": prompt_template_2 | model | parser
+    "quiz": prompt_template_2 | model | parser
   }
 )
 
@@ -52,10 +57,14 @@ The support vector machines in scikit-learn support both dense (numpy.ndarray an
 """
 
 
-chain = parallel_chain
-response = chain.invoke({"text": text})
-print(json.dumps(response, indent=2))
+merge_chain = prompt_template_3 | model | parser
 
-print("#################")
+chain = parallel_chain | merge_chain
+
+response = chain.invoke({"text": text})
+
+print("Response:", response)
+
+print("\n#################\n")
 print("Graph of the chain:")
 chain.get_graph().print_ascii()
