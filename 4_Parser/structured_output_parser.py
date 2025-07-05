@@ -59,3 +59,6 @@ try:
   print(json.dumps(response, indent=2))
 except Exception as e:
   print(f"Error: {e}")
+
+# Drawback
+# 1. We can't do data validations
